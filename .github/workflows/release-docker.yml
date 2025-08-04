@@ -46,6 +46,11 @@ jobs:
           echo "Building for linux/arm64..."
           GOARCH=arm64 go build -trimpath -ldflags="$LDFLAGS" -o komari-agent-linux-arm64
 
+          
+          echo "Building for linux/arm..."
+          GOARCH=arm GOARM=7 go build -trimpath -ldflags="$LDFLAGS" -o komari-agent-linux-armv7
+
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -73,6 +78,6 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,Linux/arm/v7
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
