@@ -1,14 +1,17 @@
-# 构建阶段
-FROM --platform=$BUILDPLATFORM golang:1.20 AS builder
+FROM alpine:3.21
+
 WORKDIR /app
-COPY . .
+
+# Docker buildx 会在构建时自动填充这些变量
 ARG TARGETOS
 ARG TARGETARCH
-ARG TARGETVARIANT
-ENV CGO_ENABLED=0
-RUN go mod tidy && GOOS=$TARGETOS GOARCH=$TARGETARCH GOARM=7 go build -o /komari-agent -trimpath -ldflags="-s -w" main.go
 
-# 运行阶段
-FROM alpine:3.22.1
-COPY --from=builder /komari-agent /usr/local/bin/komari-agent
-ENTRYPOINT ["komari-agent"]
+COPY komari-agent-${TARGETOS}-${TARGETARCH} /app/komari-agent
+
+RUN chmod +x /app/komari-agent
+
+ENTRYPOINT ["/app/komari-agent"]
+# 运行时请指定参数
+# Please specify parameters at runtime.
+# eg: docker run komari-agent -e example.com -t token
+CMD ["--help"]
